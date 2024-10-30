@@ -1,0 +1,95 @@
+---
+title: "Scripts para bash"
+output: 
+  html_document:
+      fig_caption: yes
+      toc: true
+      toc_depth: 5
+      toc_float: true
+---
+
+# 1. Cuentas de miRNAS en archivos .bam dentro de una directorio 
+
+Esta función extrae los directorios de una carpeta para poder buscar archivos con una extensión similar, en este caso bam y los resultados los almacena en una lista para que posteriormente cada uno de los elementos de la lista entre a la función count_and_save y se realice la función de conteo. Los datos los toma al ingresar a la ubicación de cada elemento y los resultados de la función los guarda en un .txt al cual se le asigna el nombre tomando en cuenta el archivo del cual fue tomado y toma los primeros 12 caracteres.
+
+Algo a considerar es que el código se guarda y ejecuta en la carpeta donde se va a querer los archivos .txt 
+
+``` {bash}
+#Esta primera función busca dentro de la dirección indicada todos los archivos con un nombre similar a TCGA y que su extensión sea .txt y los almacena en una lista que al comenzar está vacía. 
+search_route() {
+    local direct=$1
+    local -n list_res=$2
+    list_res=()
+
+    while IFS= read -r archivo; do
+        list_res+=("$archivo")
+    done < <(find "$direct" -type f -name "TCGA*.bam")
+}
+
+#Esta segunda función hace la función de contar y guardar los datos en un .txt
+count_and_save() {
+    local input_file=$1
+    local gff_file=$2
+
+    local base_name=$(basename "$input_file")
+    local out_name="${base_name:0:12}.txt" #para el nombre toma desde el caracter 0 al 12 de los archivos originales y .txt es el tipo de archivo que se genera.
+
+    htseq-count -t=miRNA -i=ID --additional-attr=Name "$input_file" "$gff_file" > "$out_name" #función para realizar el conteo a cada uno de los elementos y se ponen los datos disponibles en el archivo de anotaciones
+
+    echo "Archivo de salida creado: $output_name"
+}
+
+directory="/ruta/a/directorio" #Aquí se coloca la ruta a partir de donde quieres hacer la búsqueda (si tienes subcarpetas, también busca dentro de ellas)
+gff_file="/ruta/de/archivo/*.gff3" #Se coloca la ruta de la cual se toman las anotaciones para la función
+
+file_bam=() 
+
+search_route "$directory" file_bam
+
+echo "Archivos encontrados:"
+for ubicacion in "${file_bam[@]}"; do
+    echo "$ubicacion"
+    count_and_save "$ubicacion" "$gff_file"
+done
+``` 
+
+# 2. Cuentas de RNA para archivos .bam
+En este caso, la primera parte del código conserva la parte incial en que se buscan los archivos, y para nuestro caso, el archivo que va a buscar no tiene nombre de tipo "TCGA*.bam" por lo cual también se hará una correción. Mientras que para la segunda parte del código vamos a tomar en cuenta más caracteres para nombrarlos, pues será necesario un paso extra posteriormente
+``` {bash}
+#Esta primera función busca dentro de la dirección indicada todos los archivos con un nombre similar a TCGA y que su extensión sea .txt y los almacena en una lista que al comenzar está vacía. 
+search_route() {
+    local direct=$1
+    local -n list_res=$2
+    list_res=()
+
+    while IFS= read -r archivo; do
+        list_res+=("$archivo")
+    done < <(find "$direct" -type f -name "*.bam")
+}
+
+#Esta segunda función hace la función de contar y guardar los datos en un .txt
+count_and_save() {
+    local input_file=$1
+    local gtf_file=$2
+
+    local base_name=$(basename "$input_file")
+    local out_name="${base_name:0:36}.txt" #para el nombre toma desde el caracter 0 al 36 de los archivos originales y .txt es el tipo de archivo que se genera.
+
+    htseq-count -i=gene_id "$input_file" "$gff_file" > "$out_name" #función para realizar el conteo a cada uno de los elementos y se ponen los datos disponibles en el archivo de anotaciones
+
+    echo "Archivo de salida creado: $output_name"
+}
+
+directory="/ruta/a/directorio" #Aquí se coloca la ruta a partir de donde quieres hacer la búsqueda (si tienes subcarpetas, también busca dentro de ellas)
+gtf_file="/ruta/de/archivo/*.gt3" #Se coloca la ruta de la cual se toman las anotaciones para la función
+
+file_bam=() 
+
+search_route "$directory" file_bam
+
+echo "Archivos encontrados:"
+for ubicacion in "${file_bam[@]}"; do
+    echo "$ubicacion"
+    count_and_save "$ubicacion" "$gtf_file"
+done
+``` 

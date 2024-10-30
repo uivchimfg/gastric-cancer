@@ -1,0 +1,67 @@
+---
+title: "Códigos de R"
+output: 
+  html_document:
+      fig_caption: yes
+      toc: true
+      toc_depth: 5
+      toc_float: true
+---
+
+# Puntos comunes entre dos bases 
+
+En el código que se muestra se observan las muestras totales de cáncer en color gris, mientras que las que son rojo son las que corresponden a los ebv positivos. 
+
+
+```{r}
+library(ggplot2)
+
+#se cargan las bases, en esta parte es posible modificarlo con la dirección donde se encuentran los archivos .txt
+data3 <- scan("dataexample/bart6n2.txt", what = list(nombre= "", valor = 0))  
+data4 <- scan("dataexample/ebvposbart6n2.txt", what = list(nombre = "", valor = 0))
+
+#se convierten a data frame para poder manejarlas
+data3 <- data.frame(data3) 
+data4 <- data.frame(data4)
+
+#se buscan las coincidencias de ambas bases para encontrar los ebv positivos y marcarlos con un TRUE
+coincidencias <- merge(data3, data4, by = "nombre", all.x = TRUE)
+coincidencias$es_coin <- ! is.na(coincidencias$valor.y)
+coincidencias <- subset(coincidencias, select = -valor.y)
+coincidencias <- coincidencias[order(coincidencias$valor.x),]
+
+#Se grafican los datos, cuando coincide en TRUE, los puntos se marcarán de color rojo para poder ser identificados
+plot(coincidencias$valor.x, col = "gray", xlab = "número de pruebas", ylab = "valor de normalización", main = "Comparación de normalización vs ebv positivos")
+points(which(coincidencias$es_coin), coincidencias$valor.x[coincidencias$es_coin], col = "red")
+
+#Para corroborar que todos los puntos de interés fueron comprobados, se imprime la cantidad de coincidencias encontradas
+match_val1 <- intersect(data3$nombre, data4$nombre)
+puntos_comunes1 <- length(match_val1)
+cat("Número de puntos coincidentes:", puntos_comunes1, "\n")
+``` 
+# Script conteo de cromosomas
+
+Código para conocer conteos de cromosomas en bash
+
+
+``` {bash}
+#!/bin/bash
+bam_dir="/tu/directorio/en/el/cual/se/aplica/la/función"
+output_file="/directorio/donde/se/guarda/el/archivo/con/la/información/archivo.txt"
+
+find "$bam_dir" -type f -name "*.bam" | while read bam_file
+do
+    index_file="${bam_file}.bai"
+
+    if [ ! -f "$index_file" ]; then
+        samtools index "$bam_file"
+    fi
+
+    bam_filename=$(basename "$bam_file")
+    prefix="${bam_filename:0:24}"
+
+    samtools idxstats "$bam_file" | head -n 24 | awk -v prefix="$prefix" '$1 ~ /^chr/ {print $1, $3, prefix}' >> "$output" #aquí es posible cambiar head -n 24, dependiendo lo que se necesite, ya sea especificando el chr que se busca o la fila que le corresponde a ese genoma.
+
+done
+``` 
+

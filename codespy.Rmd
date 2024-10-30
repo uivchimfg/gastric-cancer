@@ -1,0 +1,11 @@
+---
+  title: "Códigos de Python"
+output: 
+  html_document:
+  fig_caption: yes
+toc: true
+toc_depth: 5
+toc_float: true
+---
+  
+  # 1. Fórmula de abundancia aplicada a una base

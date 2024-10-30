@@ -1,0 +1,17 @@
+name: "my-website"
+output_dir: "."
+navbar:
+  title: "Gastric Cancer"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Scripts de bash"
+      href: about.html
+    - text: "Códigos de R"
+      href: content.html
+    - text: "Códigos de Python"
+      href: codespy.html
+output:
+  html_document:
+    theme: yeti
+    highlight: textmate

@@ -1,0 +1,23 @@
+<script type="text/javascript">
+    var password = prompt("Por favor, introduce la contraseña:");
+    if (password !== "contraseña") {
+        document.body.innerHTML = "Aviso:";
+        document.body.style.backgroundColor = "#f44336"; // Fondo rojo
+        document.body.style.color = "#fff"; // Texto blanco
+        document.body.style.textAlign = "center"; // Centrar texto
+        document.body.style.paddingTop = "20%"; // Espacio desde la parte superior
+        document.body.innerHTML += "<h1>Acceso denegado.</h1>"; // Mensaje
+    }
+</script>
+
+---
+title: "Contenidos de la página"
+output: 
+  html_document:
+      fig_caption: yes
+      toc: true
+      toc_depth: 5
+      toc_float: true
+---
+
+Página de inicio para el repositorio y prueba para otra app y actualizaciones
