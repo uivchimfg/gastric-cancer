@@ -10,7 +10,7 @@ navbar:
     - text: "Códigos de R"
       href: content.html
     - text: "Códigos de Python"
-      href: codespy.html
+      href: content2.html
 output:
   html_document:
     theme: yeti

@@ -11,7 +11,7 @@
 
 
 
-<title>Scripts para bash</title>
+<title>Códigos de Python</title>
 
 <script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -342,117 +342,14 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Scripts para bash</h1>
+<h1 class="title toc-ignore">Códigos de Python</h1>
 
 </div>
 
 
-<div id="cuentas-de-mirnas-en-archivos-.bam-dentro-de-una-directorio"
+<div id="fórmula-de-abundancia-aplicada-a-una-base"
 class="section level1">
-<h1>1. Cuentas de miRNAS en archivos .bam dentro de una directorio</h1>
-<p>Esta función extrae los directorios de una carpeta para poder buscar
-archivos con una extensión similar, en este caso bam y los resultados
-los almacena en una lista para que posteriormente cada uno de los
-elementos de la lista entre a la función count_and_save y se realice la
-función de conteo. Los datos los toma al ingresar a la ubicación de cada
-elemento y los resultados de la función los guarda en un .txt al cual se
-le asigna el nombre tomando en cuenta el archivo del cual fue tomado y
-toma los primeros 12 caracteres.</p>
-<p>Algo a considerar es que el código se guarda y ejecuta en la carpeta
-donde se va a querer los archivos .txt</p>
-<pre class="bash"><code>#Esta primera función busca dentro de la dirección indicada todos los archivos con un nombre similar a TCGA y que su extensión sea .txt y los almacena en una lista que al comenzar está vacía. 
-search_route() {
-    local direct=$1
-    local -n list_res=$2
-    list_res=()
-
-    while IFS= read -r archivo; do
-        list_res+=(&quot;$archivo&quot;)
-    done &lt; &lt;(find &quot;$direct&quot; -type f -name &quot;TCGA*.bam&quot;)
-}
-
-#Esta segunda función hace la función de contar y guardar los datos en un .txt
-count_and_save() {
-    local input_file=$1
-    local gff_file=$2
-
-    local base_name=$(basename &quot;$input_file&quot;)
-    local out_name=&quot;${base_name:0:12}.txt&quot; #para el nombre toma desde el caracter 0 al 12 de los archivos originales y .txt es el tipo de archivo que se genera.
-
-    htseq-count -t=miRNA -i=ID --additional-attr=Name &quot;$input_file&quot; &quot;$gff_file&quot; &gt; &quot;$out_name&quot; #función para realizar el conteo a cada uno de los elementos y se ponen los datos disponibles en el archivo de anotaciones
-
-    echo &quot;Archivo de salida creado: $output_name&quot;
-}
-
-directory=&quot;/ruta/a/directorio&quot; #Aquí se coloca la ruta a partir de donde quieres hacer la búsqueda (si tienes subcarpetas, también busca dentro de ellas)
-gff_file=&quot;/ruta/de/archivo/*.gff3&quot; #Se coloca la ruta de la cual se toman las anotaciones para la función
-
-file_bam=() 
-
-search_route &quot;$directory&quot; file_bam
-
-echo &quot;Archivos encontrados:&quot;
-for ubicacion in &quot;${file_bam[@]}&quot;; do
-    echo &quot;$ubicacion&quot;
-    count_and_save &quot;$ubicacion&quot; &quot;$gff_file&quot;
-done</code></pre>
-<pre><code>## environment: line 3: local: `&#39;: not a valid identifier
-## find: ‘’: No such file or directory
-## Archivos encontrados:
-## 
-## environment: line 19: : No such file or directory
-## Archivo de salida creado:</code></pre>
-</div>
-<div id="cuentas-de-rna-para-archivos-.bam" class="section level1">
-<h1>2. Cuentas de RNA para archivos .bam</h1>
-<p>En este caso, la primera parte del código conserva la parte incial en
-que se buscan los archivos, y para nuestro caso, el archivo que va a
-buscar no tiene nombre de tipo “TCGA*.bam” por lo cual también se hará
-una correción. Mientras que para la segunda parte del código vamos a
-tomar en cuenta más caracteres para nombrarlos, pues será necesario un
-paso extra posteriormente</p>
-<pre class="bash"><code>#Esta primera función busca dentro de la dirección indicada todos los archivos con un nombre similar a TCGA y que su extensión sea .txt y los almacena en una lista que al comenzar está vacía. 
-search_route() {
-    local direct=$1
-    local -n list_res=$2
-    list_res=()
-
-    while IFS= read -r archivo; do
-        list_res+=(&quot;$archivo&quot;)
-    done &lt; &lt;(find &quot;$direct&quot; -type f -name &quot;*.bam&quot;)
-}
-
-#Esta segunda función hace la función de contar y guardar los datos en un .txt
-count_and_save() {
-    local input_file=$1
-    local gtf_file=$2
-
-    local base_name=$(basename &quot;$input_file&quot;)
-    local out_name=&quot;${base_name:0:36}.txt&quot; #para el nombre toma desde el caracter 0 al 36 de los archivos originales y .txt es el tipo de archivo que se genera.
-
-    htseq-count -i=gene_id &quot;$input_file&quot; &quot;$gff_file&quot; &gt; &quot;$out_name&quot; #función para realizar el conteo a cada uno de los elementos y se ponen los datos disponibles en el archivo de anotaciones
-
-    echo &quot;Archivo de salida creado: $output_name&quot;
-}
-
-directory=&quot;/ruta/a/directorio&quot; #Aquí se coloca la ruta a partir de donde quieres hacer la búsqueda (si tienes subcarpetas, también busca dentro de ellas)
-gtf_file=&quot;/ruta/de/archivo/*.gt3&quot; #Se coloca la ruta de la cual se toman las anotaciones para la función
-
-file_bam=() 
-
-search_route &quot;$directory&quot; file_bam
-
-echo &quot;Archivos encontrados:&quot;
-for ubicacion in &quot;${file_bam[@]}&quot;; do
-    echo &quot;$ubicacion&quot;
-    count_and_save &quot;$ubicacion&quot; &quot;$gtf_file&quot;
-done</code></pre>
-<pre><code>## environment: line 3: local: `&#39;: not a valid identifier
-## find: ‘’: No such file or directory
-## Archivos encontrados:
-## 
-## environment: line 19: : No such file or directory
-## Archivo de salida creado:</code></pre>
+<h1>Fórmula de abundancia aplicada a una base</h1>
 </div>
 
 
